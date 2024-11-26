@@ -2,7 +2,6 @@ import {ModeToggle} from '@/components/theme/mode-toggle'
 import {Separator} from '@/components/ui/separator'
 import {AddNoteCard} from '@/components/add-note-card'
 import {NoteCard} from '@/components/note-card'
-import {ScrollArea} from '@/components/ui/scroll-area'
 
 export default function Home() {
   return (
