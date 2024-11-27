@@ -16,11 +16,24 @@ import {useForm} from 'react-hook-form'
 import {Button} from '@/components/ui/button'
 import {Badge} from '@/components/ui/badge'
 import {useState} from 'react'
+import {format, formatDistanceToNow} from 'date-fns'
+import {ptBR} from 'date-fns/locale'
 import {z} from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {NoteSchema} from '@/validations/note-schema'
 
-export function NoteCard() {
+interface NoteCardProps {
+  note: {
+    id: string
+    title: string
+    subject: string
+    content: string
+    created_at: string
+    status: boolean
+  }
+}
+
+export function NoteCard({note}: NoteCardProps) {
   const [readOnly, setReadOnly] = useState<boolean>(true)
   const form = useForm()
   // const form = useForm<z.infer<typeof NoteSchema>>({
@@ -41,33 +54,31 @@ export function NoteCard() {
         <DialogTrigger className="text-left flex flex-col p-5 gap-3 overflow-hidden border
             hover:ring-2 focus-visible:ring-2 rounded-md">
             <span className="text-sm font-medium">
-              Título da nota
+              {note.title}
             </span>
 
           <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">
-              há 2 dias
+                {formatDistanceToNow(note.created_at, {
+                  locale: ptBR,
+                  addSuffix: true,
+                })}
               </span>
 
             <Badge>Concluído</Badge>
           </div>
 
           <p className="h-[120px] text-sm leading-6 text-muted-foreground text-ellipsis overflow-hidden line-clamp-5">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. A assumenda consequuntur distinctio,
-            impedit nisi numquam omnis temporibus. Ad at aut eum itaque maiores, molestias neque nisi quam tempora
-            undeeeeeeeeee voluptate. Lorem ipsum dolor sit amet, consectetur adipisicing elit. A assumenda consequuntur
-            distinctio,
-            impedit nisi numquam omnis temporibus. Ad at aut eum itaque maiores, molestias neque nisi quam tempora
-            unde voluptate.
+            {note.content}
           </p>
 
         </DialogTrigger>
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Título da nota</DialogTitle>
+            <DialogTitle>{note.title}</DialogTitle>
             <DialogDescription>
-              Veja detalhes e atualize sua nota.
+              {note.subject}
             </DialogDescription>
           </DialogHeader>
 
@@ -76,6 +87,7 @@ export function NoteCard() {
               <FormField
                   control={form.control}
                   name="title"
+                  defaultValue={note.title}
                   render={({field}) => (
                       <FormItem>
                         <FormLabel>Título</FormLabel>
@@ -90,6 +102,7 @@ export function NoteCard() {
               <FormField
                   control={form.control}
                   name="subject"
+                  defaultValue={note.subject}
                   render={({field}) => (
                       <FormItem>
                         <FormLabel>Assunto</FormLabel>
@@ -103,12 +116,13 @@ export function NoteCard() {
 
               <FormField
                   control={form.control}
-                  name="message"
+                  name="content"
+                  defaultValue={note.content}
                   render={({field}) => (
                       <FormItem className={'h-40'}>
-                        <FormLabel>Mensagem</FormLabel>
+                        <FormLabel>Conteúdo</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Mensagem" {...field} readOnly={readOnly} className={'mx-0 h-32'}/>
+                          <Textarea placeholder="Conteúdo" {...field} readOnly={readOnly} className={'mx-0 h-32'}/>
                         </FormControl>
                         <FormMessage/>
                       </FormItem>
@@ -119,11 +133,12 @@ export function NoteCard() {
                 <FormField
                     control={form.control}
                     name="created_at"
+                    defaultValue={format(new Date(note.created_at), 'dd/MM/yyyy', {locale: ptBR})}
                     render={({field}) => (
                         <FormItem className={'w-full'}>
                           <FormLabel>Data de criação</FormLabel>
                           <FormControl>
-                            <Input type={'date'} readOnly={readOnly} {...field} />
+                            <Input type={'text'} readOnly={true} {...field} />
                           </FormControl>
                           <FormMessage/>
                         </FormItem>
@@ -133,11 +148,12 @@ export function NoteCard() {
                 <FormField
                     control={form.control}
                     name="status"
+                    defaultValue={note.status ? 'Concluído' : 'Não concluído'}
                     render={({field}) => (
                         <FormItem className={'w-full'}>
                           <FormLabel>Status</FormLabel>
                           <FormControl>
-                            <Input placeholder="Status" readOnly={readOnly} {...field} />
+                            <Input placeholder="Status" readOnly={true} {...field} />
                           </FormControl>
                           <FormMessage/>
                         </FormItem>
