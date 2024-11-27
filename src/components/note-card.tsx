@@ -115,7 +115,7 @@ export function NoteCard({note}: NoteCardProps) {
               {note.title}
             </span>
 
-          <div className="flex items-center justify-between">
+          <div className="w-full flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">
                 {formatDistanceToNow(note.created_at, {
                   locale: ptBR,
