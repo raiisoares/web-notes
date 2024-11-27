@@ -17,11 +17,14 @@ import {zodResolver} from '@hookform/resolvers/zod'
 import {z} from 'zod'
 import {NoteSchema} from '@/validations/note-schema'
 import {useForm} from 'react-hook-form'
-import {useMutation} from '@tanstack/react-query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createNote} from '@/api/create-note'
 import {toast} from 'sonner'
+import {Note} from '@/api/find-all-notes'
 
 export function AddNoteCard() {
+  const queryClient = useQueryClient()
+
   const form = useForm<z.infer<typeof NoteSchema>>({
     resolver: zodResolver(NoteSchema),
     defaultValues: {
@@ -32,17 +35,19 @@ export function AddNoteCard() {
   })
 
   const {mutateAsync: createNoteFn, isPending} = useMutation({
-    mutationFn: createNote
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] }).then(() => {})
+      toast.success('Sua nota foi criada com sucesso!')
+      form.reset()
+    },
+    onError: () => {
+      toast.error('Algo deu errado!')
+    }
   })
 
   async function onSubmit(values: z.infer<typeof NoteSchema>) {
-    try {
-      await createNoteFn({...values})
-      form.reset()
-      toast.success('Sua nota foi criada com sucesso!')
-    } catch {
-      toast.error('Algo deu errado!')
-    }
+    await createNoteFn({...values})
   }
 
   return (
