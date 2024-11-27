@@ -22,20 +22,15 @@ import {z} from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {NoteSchema} from '@/validations/note-schema'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
-import {createNote} from '@/api/create-note'
 import {deleteNote} from '@/api/delete-note'
 import {toast} from 'sonner'
 import {updateStatus} from '@/api/update-status'
+import {Note} from '@/api/find-all-notes'
+import {EditOnDetails} from '@/components/edit-on-details'
+import {updateNote} from '@/api/update-note'
 
 interface NoteCardProps {
-  note: {
-    id: string
-    title: string
-    subject: string
-    content: string
-    created_at: string
-    status: boolean
-  }
+  note: Note
 }
 
 export function NoteCard({note}: NoteCardProps) {
@@ -44,7 +39,14 @@ export function NoteCard({note}: NoteCardProps) {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
 
-  const form = useForm()
+  const form = useForm<z.infer<typeof NoteSchema>>({
+    resolver: zodResolver(NoteSchema),
+    defaultValues: {
+      title: note.title,
+      subject: note.subject,
+      content: note.content,
+    },
+  })
 
   const {mutateAsync: deleteNoteFn, isPending: isDeleting} = useMutation({
     mutationFn: deleteNote,
@@ -73,18 +75,29 @@ export function NoteCard({note}: NoteCardProps) {
     },
   })
 
-  // const form = useForm<z.infer<typeof NoteSchema>>({
-  //   resolver: zodResolver(NoteSchema),
-  //   defaultValues: {
-  //     title: '',
-  //     subject: '',
-  //     content: '',
-  //   },
-  // })
-  //
-  // async function onSubmit(values: z.infer<typeof NoteSchema>) {
-  //   console.log(values)
-  // }
+  const {mutateAsync: updateNoteFn, isPending: isUpdatingNote} = useMutation({
+    mutationFn: updateNote,
+    onSuccess: (newNote) => {
+      queryClient.invalidateQueries({queryKey: ['notes']}).then(() => {
+      })
+      toast.success('Sua nota foi atualizada com sucesso!')
+      setReadOnly((prevState) => !prevState)
+      form.setValue('title', newNote.title)
+      form.setValue('subject', newNote.subject)
+      form.setValue('content', newNote.content)
+    },
+    onError: () => {
+      toast.error('Algo deu errado ao atualizar sua nota!')
+    },
+  })
+
+  function onHandleEdit() {
+    setReadOnly((prevState) => !prevState)
+  }
+
+  async function onSubmit(values: z.infer<typeof NoteSchema>) {
+    await updateNoteFn({id: note.id, data: {...values}})
+  }
 
   async function onDelete(id: string) {
     await deleteNoteFn({id})
@@ -128,16 +141,15 @@ export function NoteCard({note}: NoteCardProps) {
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={() => ({})} className="space-y-5">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                   control={form.control}
                   name="title"
-                  defaultValue={note.title}
                   render={({field}) => (
                       <FormItem>
                         <FormLabel>Título</FormLabel>
                         <FormControl>
-                          <Input placeholder="Título" readOnly={readOnly} {...field} />
+                          <Input placeholder="Título" readOnly={readOnly}  {...field} />
                         </FormControl>
                         <FormMessage/>
                       </FormItem>
@@ -147,7 +159,6 @@ export function NoteCard({note}: NoteCardProps) {
               <FormField
                   control={form.control}
                   name="subject"
-                  defaultValue={note.subject}
                   render={({field}) => (
                       <FormItem>
                         <FormLabel>Assunto</FormLabel>
@@ -162,7 +173,6 @@ export function NoteCard({note}: NoteCardProps) {
               <FormField
                   control={form.control}
                   name="content"
-                  defaultValue={note.content}
                   render={({field}) => (
                       <FormItem className={'h-40'}>
                         <FormLabel>Conteúdo</FormLabel>
@@ -175,56 +185,54 @@ export function NoteCard({note}: NoteCardProps) {
               />
 
               <div className={'flex gap-8'}>
-                <FormField
-                    control={form.control}
-                    name="created_at"
-                    defaultValue={format(new Date(note.created_at), 'dd/MM/yyyy', {locale: ptBR})}
-                    render={({field}) => (
-                        <FormItem className={'w-full'}>
-                          <FormLabel>Data de criação</FormLabel>
-                          <FormControl>
-                            <Input type={'text'} readOnly={true} {...field} />
-                          </FormControl>
-                          <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                <div className="w-full">
+                  <FormLabel>Data de criação</FormLabel>
+                  <Input
+                      type="text"
+                      readOnly
+                      value={format(new Date(note.created_at), 'dd/MM/yyyy', {locale: ptBR})}
+                  />
+                </div>
 
-                <FormField
-                    control={form.control}
-                    name="status"
-                    render={() => (
-                        <FormItem className={'w-full'}>
-                          <FormLabel>Status</FormLabel>
-                          <FormControl>
-                            <Input
-                                placeholder="Status"
-                                value={noteStatus ? 'Concluído' : 'Não concluído'}
-                                readOnly={true}
-                            />
-                          </FormControl>
-                          <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                <div className="w-full">
+                  <FormLabel>Status</FormLabel>
+                  <Input
+                      type="text"
+                      readOnly
+                      value={noteStatus ? 'Concluído' : 'Não concluído'}
+                  />
+                </div>
               </div>
 
               <div className={'flex w-full justify-between'}>
-                <Button type="submit" disabled={isDeleting}>Atualizar nota</Button>
-                <Button
-                    type="button"
-                    disabled={isDeleting || isUpdatingStatus}
-                    variant={'outline'}
-                    onClick={() => onUpdateStatus(note.id)}>
-                  Atualizar status
-                </Button>
-                <Button
-                    type="button"
-                    disabled={isDeleting || isUpdatingStatus}
-                    variant={'destructive'}
-                    onClick={() => onDelete(note.id)}>
-                  Deletar nota
-                </Button>
+                {readOnly ?
+                    <>
+                      <Button
+                          type="button"
+                          disabled={isDeleting}
+                          onClick={() => onHandleEdit()}>
+                        Atualizar nota
+                      </Button>
+
+                      <Button
+                          type="button"
+                          disabled={isDeleting || isUpdatingStatus}
+                          variant={'outline'}
+                          onClick={() => onUpdateStatus(note.id)}>
+                        Atualizar status
+                      </Button>
+
+                      <Button
+                          type="button"
+                          disabled={isDeleting || isUpdatingStatus}
+                          variant={'destructive'}
+                          onClick={() => onDelete(note.id)}>
+                        Deletar nota
+                      </Button>
+                    </>
+                    :
+                    <EditOnDetails disable={isUpdatingNote} handleEdit={onHandleEdit}/>
+                }
               </div>
             </form>
           </Form>
