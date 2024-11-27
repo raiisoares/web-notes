@@ -11,7 +11,7 @@ const montserrat = Montserrat({
 })
 
 export const metadata: Metadata = {
-    title: 'Notes app',
+    title: 'Web Notes',
     description: 'A web application for notes control.',
     icons: {
         icon: ['/favicon.ico'],
