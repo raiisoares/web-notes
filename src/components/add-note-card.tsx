@@ -17,6 +17,9 @@ import {zodResolver} from '@hookform/resolvers/zod'
 import {z} from 'zod'
 import {NoteSchema} from '@/validations/note-schema'
 import {useForm} from 'react-hook-form'
+import {useMutation} from '@tanstack/react-query'
+import {createNote} from '@/api/create-note'
+import {toast} from 'sonner'
 
 export function AddNoteCard() {
   const form = useForm<z.infer<typeof NoteSchema>>({
@@ -28,8 +31,18 @@ export function AddNoteCard() {
     },
   })
 
+  const {mutateAsync: createNoteFn, isPending} = useMutation({
+    mutationFn: createNote
+  })
+
   async function onSubmit(values: z.infer<typeof NoteSchema>) {
-    console.log(values)
+    try {
+      await createNoteFn({...values})
+      form.reset()
+      toast.success('Sua nota foi criada com sucesso!')
+    } catch {
+      toast.error('Algo deu errado!')
+    }
   }
 
   return (
@@ -97,7 +110,7 @@ export function AddNoteCard() {
                   )}
               />
 
-              <Button className={'mt-6'} type="submit">Criar nota</Button>
+              <Button className={'mt-6'} disabled={isPending} type="submit">Criar nota</Button>
             </form>
           </Form>
         </DialogContent>
