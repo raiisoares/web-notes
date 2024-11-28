@@ -216,7 +216,7 @@ export function NoteCard({note}: NoteCardProps) {
 
                       <Button
                           type="button"
-                          disabled={isDeleting || isUpdatingStatus}
+                          disabled={isDeleting || isUpdatingStatus||  note.status}
                           variant={'outline'}
                           onClick={() => onUpdateStatus(note.id)}>
                         Atualizar status
