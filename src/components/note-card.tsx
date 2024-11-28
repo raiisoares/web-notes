@@ -209,7 +209,7 @@ export function NoteCard({note}: NoteCardProps) {
                     <>
                       <Button
                           type="button"
-                          disabled={isDeleting}
+                          disabled={isDeleting || isUpdatingStatus}
                           onClick={() => onHandleEdit()}>
                         Atualizar nota
                       </Button>
