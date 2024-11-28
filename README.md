@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Web Notes
 
-## Getting Started
+A practical and intuitive application for creating, organizing, and managing personal or professional notes all in one place.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🖥️ Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[![Stack](https://skillicons.dev/icons?i=ts,nextjs,tailwind)](https://skillicons.dev)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ▶️ Getting Started
 
-## Learn More
+1. Create a .env file in the root of your project.
+2. Add the following variable: NEXT_PUBLIC_API_URL=, and add the URL of your API
+3. Use the following command to start the application: pnpm dev
 
-To learn more about Next.js, take a look at the following resources:
+---
+    API Link: https://api-notes-ksot.onrender.com
+    Web Link: https://webnoteswm.netlify.app
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🤝 Collaborators
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+<table>
+  <tr>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/Amelo0.png" width="100px;" alt="Alan Sarinho"/><br>
+        <sub>
+          <a href="https://github.com/Amelo0">Arthur Melo</a>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/meduardapcarvalho.png" width="100px;" alt="João Souza"/><br>
+        <sub>
+          <a href="https://github.com/meduardapcarvalho">Maria Eduarda</a>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/raiisoares.png" width="100px;" alt="Raí Soares"/><br>
+        <sub>
+          <a href="https://github.com/raiisoares">Raí Soares</a>
+        </sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This software is available under the following licenses:
+
+- [MIT](https://rem.mit-license.org)
