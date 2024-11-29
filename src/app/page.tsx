@@ -31,7 +31,7 @@ export default function Home() {
 
               <Separator/>
 
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-rows-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <AddNoteCard/>
 
                 {data?.map((note) => (
